@@ -1,23 +1,14 @@
-# README
+# Enterprise IT Support Assistant (fictional demo)
 
-## venv environment
+A learning project that simulates an Australian enterprise IT service desk.
+All employees, devices, tickets, and policies are fictional.
 
-### Create environment
+## Status
+Stage 1 of 20: rule-based command-line assistant.
 
-### Upgrade pip inside the virtual environment
-
-```shell
-python.exe -m pip install --upgrade pip
-```
-
-### Install packages
-
-```shell
-pip install -r requirements.txt
-```
-
-```shell
-pip freeze > requirements.txt
-```
-
-
+## Quick start (Windows PowerShell)
+    py -3.12 -m venv .venv
+    .\.venv\Scripts\Activate.ps1
+    pip install -r requirements.txt
+    python -m assistant_app
+    python -m pytest
