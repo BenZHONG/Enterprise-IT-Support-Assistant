@@ -1,7 +1,7 @@
-from assistant_app.cli import GREETING, MAX_MESSAGE_LENGTH, run_chat
+from assistant_app.cli import GENERIC_ERROR, GREETING, MAX_MESSAGE_LENGTH, run_chat
 
 
-def run_with(inputs: list[str]) -> list[str]:
+def run_with(inputs: list[str], assistant=None) -> list[str]:
     """Run the chat with scripted inputs and return everything printed."""
     remaining = iter(inputs)
     printed: list[str] = []
@@ -12,8 +12,18 @@ def run_with(inputs: list[str]) -> list[str]:
         except StopIteration:
             raise EOFError from None
 
-    run_chat(fake_input, printed.append)
+    run_chat(fake_input, printed.append, assistant)
     return printed
+
+
+class FixedAssistant:
+    def reply(self, message: str) -> str:
+        return f"fixed answer to: {message}"
+
+
+class BrokenAssistant:
+    def reply(self, message: str) -> str:
+        raise RuntimeError("boom secret detail")
 
 
 def test_quit_ends_the_chat():
@@ -41,3 +51,14 @@ def test_end_of_input_exits_cleanly():
 def test_overlong_message_is_rejected():
     output = run_with(["x" * (MAX_MESSAGE_LENGTH + 1), "quit"])
     assert "too long" in output[1]
+
+
+def test_injected_assistant_is_used():
+    output = run_with(["hello", "quit"], assistant=FixedAssistant())
+    assert output[1] == "Assistant: fixed answer to: hello"
+
+
+def test_unexpected_assistant_failure_shows_only_a_generic_message():
+    output = run_with(["hello", "quit"], assistant=BrokenAssistant())
+    assert output[1] == GENERIC_ERROR
+    assert "boom" not in " ".join(output)
